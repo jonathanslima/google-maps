@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+
+  <style>
+    #map-location{
+      height: 500px;
+    }
+
+    .lista-interesses{
+      list-style-type: none;
+    }
+
+    .lista-interesses li{
+      width: 33%;
+      float: left;
+      padding: 15px 0;
+    }
+
+    .lista-interesses li b{
+      padding-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map-location"></div>
+
+<ul class="lista-interesses">
+  <li id="gym"><img src="img/icons/gym.png" alt=""><b>Academias</b></li>
+  <li id="bank"><img src="img/icons/bank.png" alt=""><b>Bancos</b></li>
+  <li id="bar"><img src="img/icons/bar.png" alt=""><b>Bares</b></li>
+  <li id="school"><img src="img/icons/school.png" alt=""><b>Escolas</b></li>
+  <li id="university"><img src="img/icons/university.png" alt=""><b>Universidades</b></li>
+  <li id="hospital"><img src="img/icons/hospital.png" alt=""><b>Hospitais</b></li>
+  <li id="park"><img src="img/icons/park.png" alt=""><b>Parques</b></li>
+  <li id="restaurant"><img src="img/icons/restaurant.png" alt=""><b>Restaurantes</b></li>
+  <li id="shopping"><img src="img/icons/shopping.png" alt=""><b>Shoppings</b></li>
+  <li id="gas"><img src="img/icons/gas.png" alt=""><b>Postos</b></li>
+  <li id="pharmacy"><img src="img/icons/pharmacy.png" alt=""><b>Farmácias</b></li>
+  <li id="bakery"><img src="img/icons/bakery.png" alt=""><b>Padarias</b></li>
+</ul>
+
+  
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script defer src="https://maps.googleapis.com/maps/api/js?key=XXXXXXXXXXXXXXX&callback=initMap&libraries=places"></script>
+  <script>
+      jQuery(document).ready(function($) {
+        $('.lista-interesses').on('click', 'li', function(){
+          var $attr = $(this).attr('id');
+          initMap($attr);
+        });
+      });
+
+        var baseURL = 'img/mapa/icons';
+        var icones = {
+          gym:  baseURL + '/pin-gym.png',
+          bank:  baseURL + '/pin-bank.png',
+          bar:  baseURL + '/pin-bar.png',
+          school:  baseURL + '/pin-school.png',
+          university:  baseURL + '/pin-university.png',
+          pharmacy:  baseURL + '/pin-pharmacy.png',
+          hospital:  baseURL + '/pin-hospital.png',
+          bakery:  baseURL + '/pin-bakery.png',
+          park:  baseURL + '/pin-park.png',
+          restaurant:  baseURL + '/pin-restaurant.png',
+          shopping:  baseURL + '/pin-shopping.png',
+          gas:  baseURL + '/pin-gas.png'
+        };
+        var iconeAtual = "";
+        var nicholasCage =  'img/icons/map-marker.png';
+        var mapLocation;
+        var infowindow;
+
+      function initMap(pinPlace) {
+        iconeAtual = pinPlace;
+        var pyrmont = {lat: 'lat', lng: 'long'};
+
+          mapLocation = new google.maps.Map(document.getElementById('map-location'), {
+            center: pyrmont,
+            zoom: 16,
+            scrollwheel: false
+          });
+
+        if(pinPlace){
+          infowindow = new google.maps.InfoWindow();
+          var service = new google.maps.places.PlacesService(mapLocation);
+          service.nearbySearch({
+            location: pyrmont,
+            radius: 500,
+            // type: ['gym', 'bank', 'bar', 'school', 'university', 'pharmacy', 'hospital', 'bakery', 'park', 'restaurant', 'shopping_mall', '', 'gas_station', '', '']
+            type: [pinPlace]
+          }, function (results, status) {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+              pinBuild();
+              for (var i = 0; i < results.length; i++) {
+                createMarker(results[i]);
+              }
+            }
+          });
+        }else{
+          pinBuild();
+        }
+      }
+
+      function pinBuild() {
+        var placeLoc = {lat: 'lat', lng: 'long'};
+        var marker = new google.maps.Marker({
+          map: mapLocation,
+          position: placeLoc,
+          icon: nicholasCage
+        });
+      }
+
+      function createMarker(place) {
+        var placeLoc = place.geometry.location;
+        var marker = new google.maps.Marker({
+          map: mapLocation,
+          position: place.geometry.location,
+          icon: icones[iconeAtual]
+        });
+
+        google.maps.event.addListener(marker, 'click', function () {
+          infowindow.setContent(place.name);
+          infowindow.open(mapLocation, this);
+        });
+      }
+  </script>
+  
+  
+
+</body>
+</html>
